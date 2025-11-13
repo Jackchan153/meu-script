@@ -1,0 +1,330 @@
+-- FruitLuckAndArrowGui_100xMito.local.lua
+-- GUI para localizar frutas e roletar frutas no SEU JOGO, com Luck de 100% para Mítica quando Luck está ativa.
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Workspace = game:GetService("Workspace")
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+---------------------------------------------------------------------
+-- GUI Finder de Frutas + Luck + Seta/Arrow sobre frutas
+---------------------------------------------------------------------
+
+local luckActive = false
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "FruitFinderLuckGui"
+screenGui.Parent = PlayerGui
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Position = UDim2.new(0.5, -120, 0.04, 0)
+mainFrame.Size = UDim2.new(0, 240, 0.62, 0)
+mainFrame.AnchorPoint = Vector2.new(0.5, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(30,30,32)
+mainFrame.Parent = screenGui
+local cor = Instance.new("UICorner",mainFrame)
+cor.CornerRadius = UDim.new(0,20)
+
+local title = Instance.new("TextLabel")
+title.Name = "Title"
+title.Size = UDim2.new(1, 0, 0, 36)
+title.Position = UDim2.new(0, 0, 0, 0)
+title.BackgroundTransparency = 1
+title.Text = "Finder de Frutas 🍉"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 20
+title.TextColor3 = Color3.fromRGB(255, 240, 160)
+title.Parent = mainFrame
+
+local luckBtn = Instance.new("TextButton")
+luckBtn.Position = UDim2.new(0.08, 0, 0, 40)
+luckBtn.Size = UDim2.new(0.56, 0, 0, 33)
+luckBtn.BackgroundColor3 = Color3.fromRGB(245,212,110)
+luckBtn.Text = "Ativar Luck 🍀"
+luckBtn.Font = Enum.Font.GothamBold
+luckBtn.TextSize = 16
+luckBtn.TextColor3 = Color3.new(0.1,0.4,0.1)
+luckBtn.Parent = mainFrame
+local cor2 = Instance.new("UICorner",luckBtn)
+cor2.CornerRadius = UDim.new(0,14)
+
+local roletarBtn = Instance.new("TextButton")
+roletarBtn.Position = UDim2.new(0.65, 8, 0, 40)
+roletarBtn.Size = UDim2.new(0.28, 0, 0, 33)
+roletarBtn.BackgroundColor3 = Color3.fromRGB(65,160,222)
+roletarBtn.Text = "Roletar"
+roletarBtn.Font = Enum.Font.GothamBold
+roletarBtn.TextSize = 15
+roletarBtn.TextColor3 = Color3.new(1,1,1)
+roletarBtn.Parent = mainFrame
+local cor3 = Instance.new("UICorner",roletarBtn)
+cor3.CornerRadius = UDim.new(0,13)
+
+local closeBtn = Instance.new("TextButton")
+closeBtn.Name = "Close"
+closeBtn.Text = "✖"
+closeBtn.Font = Enum.Font.Gotham
+closeBtn.TextSize = 18
+closeBtn.TextColor3 = Color3.fromRGB(255,255,255)
+closeBtn.BackgroundColor3 = Color3.fromRGB(180,60,60)
+closeBtn.Position = UDim2.new(0.87, 8, 0, 6)
+closeBtn.Size = UDim2.new(0.1, -12, 0, 22)
+closeBtn.Parent = mainFrame
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(1, 0)
+closeCorner.Parent = closeBtn
+
+local info = Instance.new("TextLabel")
+info.Size = UDim2.new(1,-16,0,32)
+info.Position = UDim2.new(0,8,0,76)
+info.BackgroundTransparency = 1
+info.Font = Enum.Font.Gotham
+info.TextSize = 15
+info.TextColor3 = Color3.fromRGB(255,255,255)
+info.Text = "Bonus de sorte: DESATIVADO"
+info.Parent = mainFrame
+
+local listFrame = Instance.new("ScrollingFrame")
+listFrame.Name = "List"
+listFrame.Position = UDim2.new(0.06, 0, 0, 116)
+listFrame.Size = UDim2.new(0.88, 0, 0.78, 0)
+listFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+listFrame.ScrollBarThickness = 7
+listFrame.BackgroundTransparency = 0.13
+listFrame.BackgroundColor3 = Color3.fromRGB(36,40,46)
+listFrame.BorderSizePixel = 0
+listFrame.Parent = mainFrame
+
+local listCorner = Instance.new("UICorner")
+listCorner.CornerRadius = UDim.new(0, 15)
+listCorner.Parent = listFrame
+
+local uiListLayout = Instance.new("UIListLayout")
+uiListLayout.Parent = listFrame
+uiListLayout.Padding = UDim.new(0, 8)
+uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+local function createListItem(nameText, distanceText, posText)
+    local item = Instance.new("TextButton")
+    item.Size = UDim2.new(1,-8, 0, 52)
+    item.BackgroundColor3 = Color3.fromRGB(50,52,56)
+    item.Text = ""
+    item.Parent = listFrame
+    local corner = Instance.new("UICorner",item)
+    corner.CornerRadius = UDim.new(0,12)
+
+    local nameLabel = Instance.new("TextLabel")
+    nameLabel.Name = "Name"
+    nameLabel.Size = UDim2.new(0.58, -6, 0.56, 0)
+    nameLabel.Position = UDim2.new(0, 8, 0, 4)
+    nameLabel.BackgroundTransparency = 1
+    nameLabel.Text = nameText
+    nameLabel.Font = Enum.Font.GothamSemibold
+    nameLabel.TextSize = 15
+    nameLabel.TextColor3 = Color3.fromRGB(255,255,255)
+    nameLabel.TextXAlignment = Enum.TextXAlignment.Left
+    nameLabel.Parent = item
+
+    local distLabel = Instance.new("TextLabel")
+    distLabel.Name = "Distance"
+    distLabel.Size = UDim2.new(0.39, -6, 0.56, 0)
+    distLabel.Position = UDim2.new(0.61, 5, 0, 4)
+    distLabel.BackgroundTransparency = 1
+    distLabel.Text = distanceText
+    distLabel.Font = Enum.Font.Gotham
+    distLabel.TextSize = 14
+    distLabel.TextColor3 = Color3.fromRGB(220,255,169)
+    distLabel.TextXAlignment = Enum.TextXAlignment.Right
+    distLabel.Parent = item
+
+    local posLabel = Instance.new("TextLabel")
+    posLabel.Name = "Position"
+    posLabel.Size = UDim2.new(1, -10, 0.44, 0)
+    posLabel.Position = UDim2.new(0, 8, 0.56, 0)
+    posLabel.BackgroundTransparency = 1
+    posLabel.Text = posText
+    posLabel.Font = Enum.Font.Gotham
+    posLabel.TextSize = 13
+    posLabel.TextColor3 = Color3.fromRGB(153,215,255)
+    posLabel.TextXAlignment = Enum.TextXAlignment.Left
+    posLabel.TextWrapped = true
+    posLabel.Parent = item
+
+    return item
+end
+
+local function UpdateFruitList()
+    for _, child in ipairs(listFrame:GetChildren()) do
+        if child:IsA("GuiObject") and child ~= uiListLayout then
+            child:Destroy()
+        end
+    end
+
+    local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local hrp = character:FindFirstChild("HumanoidRootPart")
+    if not hrp then
+        info.Text = "Personagem não carregado!"
+        return
+    end
+
+    local encontrou = false
+    for _, obj in ipairs(Workspace:GetDescendants()) do
+        pcall(function()
+            if obj:FindFirstChild("Handle") and string.find(obj.Name, "Fruit") then
+                encontrou = true
+                local handle = obj.Handle
+                local distance = (hrp.Position - handle.Position).Magnitude
+                local distanciaTxt = string.format("%d studs", math.floor(distance))
+                local posTxt = string.format("X:%.1f Y:%.1f Z:%.1f", handle.Position.X, handle.Position.Y, handle.Position.Z)
+                local item = createListItem(obj.Name, distanciaTxt, posTxt)
+                item.MouseButton1Click:Connect(function()
+                    info.Text = "Selecionado: "..obj.Name.." — "..distanciaTxt
+                end)
+            end
+        end)
+    end
+
+    local totalSize = uiListLayout.AbsoluteContentSize.Y
+    listFrame.CanvasSize = UDim2.new(0, 0, 0, totalSize + 10)
+
+    if not encontrou then
+        info.Text = "Nenhuma fruta dropada encontrada!"
+    end
+end
+
+luckBtn.MouseButton1Click:Connect(function()
+    luckActive = not luckActive
+    if luckActive then
+        luckBtn.Text = "Luck 100% MITICA 🍀"
+        luckBtn.BackgroundColor3 = Color3.fromRGB(60,210,110)
+        info.Text = "Você vai tirar fruta mítica!"
+    else
+        luckBtn.Text = "Ativar Luck 🍀"
+        luckBtn.BackgroundColor3 = Color3.fromRGB(245,212,110)
+        info.Text = "Bonus de sorte: DESATIVADO"
+    end
+end)
+
+closeBtn.MouseButton1Click:Connect(function()
+    screenGui.Enabled = false
+end)
+
+-----------------------------------------------------------------
+-- FUNÇÃO DE ROLETAR: 100% de CHANCE FRUTA MÍTICA com Luck ON --
+-----------------------------------------------------------------
+local frutas = {
+    {"Chop", 0.55},  -- comum
+    {"Bomb", 0.40},  -- comum
+    {"Ice", 0.035},  -- rara
+    {"Light", 0.012},-- lendária
+    {"Dragon", 0.003}-- mítica
+}
+
+function RolarFruta()
+    local ganhou
+    if luckActive then
+        -- Busca automaticamente a fruta mítica (a última da lista neste exemplo)
+        for i,fruit in ipairs(frutas) do
+            if fruit[1]=="Dragon" then 
+                ganhou = fruit[1]
+                break
+            end
+        end
+        info.Text = "Você tirou: " .. (ganhou or "??") .. " (MÍTICA GARANTIDA!)"
+        print("[Luck 100%] Rolou fruta:", ganhou)
+        return ganhou
+    else
+        -- Método normal: chances padrão
+        local chancesAcumuladas, total = {}, 0
+        for i, v in ipairs(frutas) do
+            local chance = v[2]
+            total = total + chance
+            table.insert(chancesAcumuladas, {v[1], total})
+        end
+        local sorteio = math.random() * total
+        local idx = 1
+        for i, v in ipairs(chancesAcumuladas) do
+            if sorteio <= v[2] then
+                idx = i
+                break
+            end
+        end
+        ganhou = chancesAcumuladas[idx][1]
+        info.Text = "Você tirou: "..ganhou
+        print("[Luck OFF] Rolou fruta:", ganhou)
+        return ganhou
+    end
+end
+
+roletarBtn.MouseButton1Click:Connect(RolarFruta)
+
+-----------------------------------------------------------------
+-- Seta/Arrow ESP acima das frutas
+-----------------------------------------------------------------
+local arrows = {}
+
+local function createArrow(fruit)
+    if not fruit:FindFirstChild("Handle") then return end
+    if fruit.Handle:FindFirstChild("FruitArrowESP") then return end
+
+    local billboard = Instance.new("BillboardGui")
+    billboard.Name = "FruitArrowESP"
+    billboard.Adornee = fruit.Handle
+    billboard.Size = UDim2.new(0, 115, 0, 44)
+    billboard.StudsOffset = Vector3.new(0, 3, 0)
+    billboard.AlwaysOnTop = true
+    billboard.Parent = fruit.Handle
+
+    local arrowLabel = Instance.new("TextLabel")
+    arrowLabel.Parent = billboard
+    arrowLabel.Size = UDim2.new(1, 0, 0.52, 0)
+    arrowLabel.Position = UDim2.new(0, 0, 0, 0)
+    arrowLabel.BackgroundTransparency = 1
+    arrowLabel.Text = "▲"
+    arrowLabel.Font = Enum.Font.GothamBold
+    arrowLabel.TextSize = 24
+    arrowLabel.TextColor3 = Color3.fromRGB(242, 203, 74)
+    arrowLabel.TextStrokeTransparency = 0.2
+
+    local nameLabel = Instance.new("TextLabel")
+    nameLabel.Parent = billboard
+    nameLabel.Size = UDim2.new(1, 0, 0.48, 0)
+    nameLabel.Position = UDim2.new(0, 0, 0.52, 0)
+    nameLabel.BackgroundTransparency = 1
+    nameLabel.Text = fruit.Name
+    nameLabel.Font = Enum.Font.GothamSemibold
+    nameLabel.TextSize = 13
+    nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    nameLabel.TextStrokeTransparency = 0.6
+end
+
+local function updateArrows()
+    for fruit, _ in pairs(arrows) do
+        if not fruit or not fruit.Parent or not fruit:FindFirstChild("Handle") then
+            arrows[fruit] = nil
+        end
+    end
+    for _, obj in ipairs(Workspace:GetChildren()) do
+        if obj:IsA("Model") or obj:IsA("Tool") then
+            if obj:FindFirstChild("Handle") and string.find(obj.Name, "Fruit") then
+                if not obj.Handle:FindFirstChild("FruitArrowESP") then
+                    createArrow(obj)
+                    arrows[obj] = true
+                end
+            end
+        end
+    end
+end
+
+task.spawn(function()
+    while true do
+        pcall(function()
+            UpdateFruitList()
+            updateArrows()
+        end)
+        wait(2)
+    end
+end)
+
+UpdateFruitList()
+updateArrows()
