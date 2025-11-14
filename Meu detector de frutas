@@ -1,64 +1,59 @@
--- FruitLuckAndArrowGui_100xMito.local.lua
--- GUI para localizar frutas e roletar frutas no SEU JOGO, com Luck de 100% para Mítica quando Luck está ativa.
+-- FruitArrowESPWithTallGui.local.lua
+-- GUI mais estreita na horizontal e MAIS ALTA na vertical + Seta/arrow acima das frutas mostrando nome.
+-- Use em StarterPlayerScripts ou StarterGui.
 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local Workspace = game:GetService("Workspace")
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
----------------------------------------------------------------------
--- GUI Finder de Frutas + Luck + Seta/Arrow sobre frutas
----------------------------------------------------------------------
-
-local luckActive = false
-
+-- Criação da GUI principal (ScreenGui)
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "FruitFinderLuckGui"
+screenGui.Name = "MobileFruitFinderGui"
+screenGui.ResetOnSpawn = false
 screenGui.Parent = PlayerGui
 
+-- Frame principal mais ESTREITO e mais ALTO e arredondado
 local mainFrame = Instance.new("Frame")
-mainFrame.Position = UDim2.new(0.5, -120, 0.04, 0)
-mainFrame.Size = UDim2.new(0, 240, 0.62, 0)
-mainFrame.AnchorPoint = Vector2.new(0.5, 0)
-mainFrame.BackgroundColor3 = Color3.fromRGB(30,30,32)
+mainFrame.Name = "MainFrame"
+mainFrame.AnchorPoint = Vector2.new(0.5,0)
+mainFrame.Position = UDim2.new(0.5, 0, 0.04, 0)
+mainFrame.Size = UDim2.new(0.45, 0, 0.7, 0) -- <--- MAIS ALTO (era 0.38)
+mainFrame.BackgroundTransparency = 0.07
+mainFrame.BackgroundColor3 = Color3.fromRGB(26,26,26)
+mainFrame.BorderSizePixel = 0
 mainFrame.Parent = screenGui
-local cor = Instance.new("UICorner",mainFrame)
-cor.CornerRadius = UDim.new(0,20)
+
+local mainCorner = Instance.new("UICorner")
+mainCorner.CornerRadius = UDim.new(0, 20)
+mainCorner.Parent = mainFrame
 
 local title = Instance.new("TextLabel")
 title.Name = "Title"
-title.Size = UDim2.new(1, 0, 0, 36)
+title.Size = UDim2.new(1, 0, 0, 38)
 title.Position = UDim2.new(0, 0, 0, 0)
 title.BackgroundTransparency = 1
 title.Text = "Finder de Frutas 🍉"
 title.Font = Enum.Font.GothamBold
-title.TextSize = 20
-title.TextColor3 = Color3.fromRGB(255, 240, 160)
+title.TextSize = 22
+title.TextColor3 = Color3.fromRGB(242, 203, 74)
 title.Parent = mainFrame
 
-local luckBtn = Instance.new("TextButton")
-luckBtn.Position = UDim2.new(0.08, 0, 0, 40)
-luckBtn.Size = UDim2.new(0.56, 0, 0, 33)
-luckBtn.BackgroundColor3 = Color3.fromRGB(245,212,110)
-luckBtn.Text = "Ativar Luck 🍀"
-luckBtn.Font = Enum.Font.GothamBold
-luckBtn.TextSize = 16
-luckBtn.TextColor3 = Color3.new(0.1,0.4,0.1)
-luckBtn.Parent = mainFrame
-local cor2 = Instance.new("UICorner",luckBtn)
-cor2.CornerRadius = UDim.new(0,14)
+-- Botões (Atualizar e Fechar) com bordas arredondadas
+local refreshBtn = Instance.new("TextButton")
+refreshBtn.Name = "Refresh"
+refreshBtn.Text = "Atualizar"
+refreshBtn.Font = Enum.Font.GothamSemibold
+refreshBtn.TextSize = 18
+refreshBtn.TextColor3 = Color3.fromRGB(255,255,255)
+refreshBtn.BackgroundColor3 = Color3.fromRGB(48,163,104)
+refreshBtn.Position = UDim2.new(0.03, 0, 0, 44)
+refreshBtn.Size = UDim2.new(0.6, -6, 0, 34)
+refreshBtn.Parent = mainFrame
 
-local roletarBtn = Instance.new("TextButton")
-roletarBtn.Position = UDim2.new(0.65, 8, 0, 40)
-roletarBtn.Size = UDim2.new(0.28, 0, 0, 33)
-roletarBtn.BackgroundColor3 = Color3.fromRGB(65,160,222)
-roletarBtn.Text = "Roletar"
-roletarBtn.Font = Enum.Font.GothamBold
-roletarBtn.TextSize = 15
-roletarBtn.TextColor3 = Color3.new(1,1,1)
-roletarBtn.Parent = mainFrame
-local cor3 = Instance.new("UICorner",roletarBtn)
-cor3.CornerRadius = UDim.new(0,13)
+local refreshCorner = Instance.new("UICorner")
+refreshCorner.CornerRadius = UDim.new(0, 18)
+refreshCorner.Parent = refreshBtn
 
 local closeBtn = Instance.new("TextButton")
 closeBtn.Name = "Close"
@@ -67,36 +62,41 @@ closeBtn.Font = Enum.Font.Gotham
 closeBtn.TextSize = 18
 closeBtn.TextColor3 = Color3.fromRGB(255,255,255)
 closeBtn.BackgroundColor3 = Color3.fromRGB(180,60,60)
-closeBtn.Position = UDim2.new(0.87, 8, 0, 6)
-closeBtn.Size = UDim2.new(0.1, -12, 0, 22)
+closeBtn.Position = UDim2.new(0.69, 6, 0, 44)
+closeBtn.Size = UDim2.new(0.28, 0, 0, 34)
 closeBtn.Parent = mainFrame
+
 local closeCorner = Instance.new("UICorner")
 closeCorner.CornerRadius = UDim.new(1, 0)
 closeCorner.Parent = closeBtn
 
-local info = Instance.new("TextLabel")
-info.Size = UDim2.new(1,-16,0,32)
-info.Position = UDim2.new(0,8,0,76)
-info.BackgroundTransparency = 1
-info.Font = Enum.Font.Gotham
-info.TextSize = 15
-info.TextColor3 = Color3.fromRGB(255,255,255)
-info.Text = "Bonus de sorte: DESATIVADO"
-info.Parent = mainFrame
+-- Label informativa
+local infoLabel = Instance.new("TextLabel")
+infoLabel.Name = "Info"
+infoLabel.Size = UDim2.new(1, -10, 0, 22)
+infoLabel.Position = UDim2.new(0, 5, 0, 80)
+infoLabel.BackgroundTransparency = 1
+infoLabel.Text = "Clique em uma fruta na lista para ver detalhes."
+infoLabel.Font = Enum.Font.Gotham
+infoLabel.TextSize = 15
+infoLabel.TextColor3 = Color3.fromRGB(220,220,220)
+infoLabel.TextXAlignment = Enum.TextXAlignment.Left
+infoLabel.Parent = mainFrame
 
+-- Lista rolável das frutas (MAIS ALTA)
 local listFrame = Instance.new("ScrollingFrame")
 listFrame.Name = "List"
-listFrame.Position = UDim2.new(0.06, 0, 0, 116)
-listFrame.Size = UDim2.new(0.88, 0, 0.78, 0)
+listFrame.Position = UDim2.new(0.02, 0, 0, 106)
+listFrame.Size = UDim2.new(0.96, 0, 1, -113) -- acompanha a altura maior da mainFrame
 listFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
 listFrame.ScrollBarThickness = 7
-listFrame.BackgroundTransparency = 0.13
+listFrame.BackgroundTransparency = 0.1
 listFrame.BackgroundColor3 = Color3.fromRGB(36,40,46)
 listFrame.BorderSizePixel = 0
 listFrame.Parent = mainFrame
 
 local listCorner = Instance.new("UICorner")
-listCorner.CornerRadius = UDim.new(0, 15)
+listCorner.CornerRadius = UDim.new(0, 18)
 listCorner.Parent = listFrame
 
 local uiListLayout = Instance.new("UIListLayout")
@@ -106,29 +106,31 @@ uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
 local function createListItem(nameText, distanceText, posText)
     local item = Instance.new("TextButton")
-    item.Size = UDim2.new(1,-8, 0, 52)
+    item.Size = UDim2.new(1,-8, 0, 54)
+    item.Position = UDim2.new(0,0,0,0)
+    item.AutoButtonColor = true
     item.BackgroundColor3 = Color3.fromRGB(50,52,56)
     item.Text = ""
     item.Parent = listFrame
     local corner = Instance.new("UICorner",item)
-    corner.CornerRadius = UDim.new(0,12)
+    corner.CornerRadius = UDim.new(0,15)
 
     local nameLabel = Instance.new("TextLabel")
     nameLabel.Name = "Name"
-    nameLabel.Size = UDim2.new(0.58, -6, 0.56, 0)
-    nameLabel.Position = UDim2.new(0, 8, 0, 4)
+    nameLabel.Size = UDim2.new(0.6, -8, 0.6, 0)
+    nameLabel.Position = UDim2.new(0, 10, 0, 6)
     nameLabel.BackgroundTransparency = 1
     nameLabel.Text = nameText
     nameLabel.Font = Enum.Font.GothamSemibold
-    nameLabel.TextSize = 15
+    nameLabel.TextSize = 16
     nameLabel.TextColor3 = Color3.fromRGB(255,255,255)
     nameLabel.TextXAlignment = Enum.TextXAlignment.Left
     nameLabel.Parent = item
 
     local distLabel = Instance.new("TextLabel")
     distLabel.Name = "Distance"
-    distLabel.Size = UDim2.new(0.39, -6, 0.56, 0)
-    distLabel.Position = UDim2.new(0.61, 5, 0, 4)
+    distLabel.Size = UDim2.new(0.34, -10, 0.55, 0)
+    distLabel.Position = UDim2.new(0.64, 0, 0, 6)
     distLabel.BackgroundTransparency = 1
     distLabel.Text = distanceText
     distLabel.Font = Enum.Font.Gotham
@@ -139,8 +141,8 @@ local function createListItem(nameText, distanceText, posText)
 
     local posLabel = Instance.new("TextLabel")
     posLabel.Name = "Position"
-    posLabel.Size = UDim2.new(1, -10, 0.44, 0)
-    posLabel.Position = UDim2.new(0, 8, 0.56, 0)
+    posLabel.Size = UDim2.new(1, -10, 0.38, 0)
+    posLabel.Position = UDim2.new(0, 10, 0.62, 0)
     posLabel.BackgroundTransparency = 1
     posLabel.Text = posText
     posLabel.Font = Enum.Font.Gotham
@@ -163,7 +165,7 @@ local function UpdateFruitList()
     local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
     local hrp = character:FindFirstChild("HumanoidRootPart")
     if not hrp then
-        info.Text = "Personagem não carregado!"
+        infoLabel.Text = "Personagem não carregado!"
         return
     end
 
@@ -178,7 +180,7 @@ local function UpdateFruitList()
                 local posTxt = string.format("X:%.1f Y:%.1f Z:%.1f", handle.Position.X, handle.Position.Y, handle.Position.Z)
                 local item = createListItem(obj.Name, distanciaTxt, posTxt)
                 item.MouseButton1Click:Connect(function()
-                    info.Text = "Selecionado: "..obj.Name.." — "..distanciaTxt
+                    infoLabel.Text = "Selecionado: "..obj.Name.." — "..distanciaTxt
                 end)
             end
         end)
@@ -188,79 +190,22 @@ local function UpdateFruitList()
     listFrame.CanvasSize = UDim2.new(0, 0, 0, totalSize + 10)
 
     if not encontrou then
-        info.Text = "Nenhuma fruta dropada encontrada!"
+        infoLabel.Text = "Nenhuma fruta dropada encontrada!"
+    else
+        infoLabel.Text = "Clique em uma fruta para ver detalhes."
     end
 end
 
-luckBtn.MouseButton1Click:Connect(function()
-    luckActive = not luckActive
-    if luckActive then
-        luckBtn.Text = "Luck 100% MITICA 🍀"
-        luckBtn.BackgroundColor3 = Color3.fromRGB(60,210,110)
-        info.Text = "Você vai tirar fruta mítica!"
-    else
-        luckBtn.Text = "Ativar Luck 🍀"
-        luckBtn.BackgroundColor3 = Color3.fromRGB(245,212,110)
-        info.Text = "Bonus de sorte: DESATIVADO"
-    end
-end)
+-- Botões GUI
+refreshBtn.MouseButton1Click:Connect(UpdateFruitList)
+closeBtn.MouseButton1Click:Connect(function() screenGui.Enabled = false end)
 
-closeBtn.MouseButton1Click:Connect(function()
-    screenGui.Enabled = false
-end)
+UpdateFruitList()
 
------------------------------------------------------------------
--- FUNÇÃO DE ROLETAR: 100% de CHANCE FRUTA MÍTICA com Luck ON --
------------------------------------------------------------------
-local frutas = {
-    {"Chop", 0.55},  -- comum
-    {"Bomb", 0.40},  -- comum
-    {"Ice", 0.035},  -- rara
-    {"Light", 0.012},-- lendária
-    {"Dragon", 0.003}-- mítica
-}
+-----------------------------------------------------
+-- -------- Seta/Arrow ESP acima das frutas ---------
+-----------------------------------------------------
 
-function RolarFruta()
-    local ganhou
-    if luckActive then
-        -- Busca automaticamente a fruta mítica (a última da lista neste exemplo)
-        for i,fruit in ipairs(frutas) do
-            if fruit[1]=="Dragon" then 
-                ganhou = fruit[1]
-                break
-            end
-        end
-        info.Text = "Você tirou: " .. (ganhou or "??") .. " (MÍTICA GARANTIDA!)"
-        print("[Luck 100%] Rolou fruta:", ganhou)
-        return ganhou
-    else
-        -- Método normal: chances padrão
-        local chancesAcumuladas, total = {}, 0
-        for i, v in ipairs(frutas) do
-            local chance = v[2]
-            total = total + chance
-            table.insert(chancesAcumuladas, {v[1], total})
-        end
-        local sorteio = math.random() * total
-        local idx = 1
-        for i, v in ipairs(chancesAcumuladas) do
-            if sorteio <= v[2] then
-                idx = i
-                break
-            end
-        end
-        ganhou = chancesAcumuladas[idx][1]
-        info.Text = "Você tirou: "..ganhou
-        print("[Luck OFF] Rolou fruta:", ganhou)
-        return ganhou
-    end
-end
-
-roletarBtn.MouseButton1Click:Connect(RolarFruta)
-
------------------------------------------------------------------
--- Seta/Arrow ESP acima das frutas
------------------------------------------------------------------
 local arrows = {}
 
 local function createArrow(fruit)
@@ -270,30 +215,30 @@ local function createArrow(fruit)
     local billboard = Instance.new("BillboardGui")
     billboard.Name = "FruitArrowESP"
     billboard.Adornee = fruit.Handle
-    billboard.Size = UDim2.new(0, 115, 0, 44)
+    billboard.Size = UDim2.new(0, 120, 0, 40)
     billboard.StudsOffset = Vector3.new(0, 3, 0)
     billboard.AlwaysOnTop = true
     billboard.Parent = fruit.Handle
 
     local arrowLabel = Instance.new("TextLabel")
     arrowLabel.Parent = billboard
-    arrowLabel.Size = UDim2.new(1, 0, 0.52, 0)
+    arrowLabel.Size = UDim2.new(1, 0, 0.5, 0)
     arrowLabel.Position = UDim2.new(0, 0, 0, 0)
     arrowLabel.BackgroundTransparency = 1
     arrowLabel.Text = "▲"
     arrowLabel.Font = Enum.Font.GothamBold
-    arrowLabel.TextSize = 24
+    arrowLabel.TextSize = 28
     arrowLabel.TextColor3 = Color3.fromRGB(242, 203, 74)
     arrowLabel.TextStrokeTransparency = 0.2
 
     local nameLabel = Instance.new("TextLabel")
     nameLabel.Parent = billboard
-    nameLabel.Size = UDim2.new(1, 0, 0.48, 0)
-    nameLabel.Position = UDim2.new(0, 0, 0.52, 0)
+    nameLabel.Size = UDim2.new(1, 0, 0.5, 0)
+    nameLabel.Position = UDim2.new(0, 0, 0.5, 0)
     nameLabel.BackgroundTransparency = 1
     nameLabel.Text = fruit.Name
     nameLabel.Font = Enum.Font.GothamSemibold
-    nameLabel.TextSize = 13
+    nameLabel.TextSize = 14
     nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     nameLabel.TextStrokeTransparency = 0.6
 end
@@ -318,13 +263,7 @@ end
 
 task.spawn(function()
     while true do
-        pcall(function()
-            UpdateFruitList()
-            updateArrows()
-        end)
+        pcall(updateArrows)
         wait(2)
     end
 end)
-
-UpdateFruitList()
-updateArrows()
